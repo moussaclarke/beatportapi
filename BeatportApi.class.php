@@ -1,7 +1,7 @@
 <?php
 /**
- * Beatport OAuth API by Federico Giust
- * Based on Beatport OAuth Connect by Tim Brandwijk
+ * Based on Beatport OAuth API by Federico Giust
+ * and Beatport OAuth Connect by Tim Brandwijk
  *
  * Needs beatport_callback.php script to verify the credentials:
  *  <?php
