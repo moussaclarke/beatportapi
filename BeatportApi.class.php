@@ -18,11 +18,6 @@
 */
 include 'config.php';
 
-/**
-* Include to log the api calls in the db.
-*/
-include('log_calls.php');
-
 // Set default timezone to beatport timezone
 date_default_timezone_set('America/Los_Angeles');
 
