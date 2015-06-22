@@ -13,41 +13,42 @@
  *   ?>
  */
 
-/**
-* Include config file where we store the corresponding constants.
-*/
-include 'config.php';
+class BeatportApi {
 
+	private $oauth;
+
+	function __construct ($parameters) {
+// parameter array consumer, secret, login, password, token, tokensecret, callbackurl
 // Set default timezone to beatport timezone
-date_default_timezone_set('America/Los_Angeles');
+date_default_timezone_set('America/Los_Angeles'); // this might well screw up other scripts. need to figure out where it's relevant and set it purely for that then reset it to current one. use date_default_timezone_get to get current timezone
 
 // Beatport URLs. Note the oauth_callback after the request url. This is needed to catch the verifier string:
-$req_url = 'https://oauth-api.beatport.com/identity/1/oauth/request-token?oauth_callback='.urlencode(WEBSITE);
-$authurl = 'https://oauth-api.beatport.com/identity/1/oauth/authorize';
-$auth_submiturl = "https://oauth-api.beatport.com/identity/1/oauth/authorize-submit";
-$acc_url = 'https://oauth-api.beatport.com/identity/1/oauth/access-token';
+$callbackurl = $parameters["callbackurl"];
+$conskey = $parameters["consumer"]; // Beatport Consumer Key
+$conssec = $parameters["secret"]; // Beatport Consumer Secret
+$beatport_login = $parameters["login"];; // Beatport Username
+$beatport_password = $parameters["password"]; // Beatport Password
+$this->oauth=$this->oAuthDance($callbackurl,$conskey,$conssec,$beatport_login,$beatport_password);
 
-$conskey = CONSUMERKEY; // Beatport Consumer Key
-$conssec = SECRETKEY; // Beatport Consumer Secret
-$beatport_login = BEATPORTLOGIN; // Beatport Username
-$beatport_password = BEATPORTPASSWORD; // Beatport Password
+}
 
-// URL Parameters to make the api call and generate a JSON object
-if(isset($_GET['facets'])) {
-	$facets=$_GET['facets'];
-}
-if(isset($_GET['sortBy'])){
-	$sortBy=$_GET['sortBy'];
-}
-if(isset($_GET['perPage'])){
-	$perPage=$_GET['perPage'];
-}
-if(isset($_GET['id'])){
-	$id=$_GET['id'];
-}
-if(isset($_GET['url'])){
-	$url=$_GET['url'];
-}
+private function buildQuery ($parameters) {
+// generate the query - parameters array with facets, sortBy, perPage, id, url
+
+	$facets=$parameters['facets'];
+
+
+	$sortBy=$parameters['sortBy'];
+
+
+	$perPage=$parameters['perPage'];
+
+
+	$id=$parameters['id'];
+
+
+	$url=$parameters['url'];
+
 
 $qrystring = '';
 
@@ -68,6 +69,17 @@ if(isset($perPage) && strlen($perPage) > 0){
 if(isset($url) && strlen($url) > 0){
 	$path = $url;
 }
+
+return array( "qrystring"=>$qrystring, "path"=>$path);
+
+}
+
+private function oAuthDance ($callbackurl,$conskey,$conssec,$beatport_login,$beatport_password) {
+
+$req_url = 'https://oauth-api.beatport.com/identity/1/oauth/request-token?oauth_callback='. $callbackurl;
+$authurl = 'https://oauth-api.beatport.com/identity/1/oauth/authorize';
+$auth_submiturl = "https://oauth-api.beatport.com/identity/1/oauth/authorize-submit";
+$acc_url = 'https://oauth-api.beatport.com/identity/1/oauth/access-token';
 
 /**
  * Step 1: Get a Request token
@@ -129,14 +141,21 @@ if(empty($get_access_token)) {
  */
 $oauth->setToken($get_access_token['oauth_token'],$get_access_token['oauth_token_secret']);
 
-/**
- * Step 6: Test request.
- */
-$oauth->fetch('https://oauth-api.beatport.com/catalog/3/' . $path . $qrystring);
-$json = $oauth->getLastResponse();
+return $oauth;
 
-header('Content-Type: application/json');
+}
 
-echo $json;
+public function queryApi ($parameters) {
+	$query = $this->buildQuery ($parameters);
+	$path= $query['path'];
+	$qrystring=$query['qrystring'];
+$this->oauth->fetch('https://oauth-api.beatport.com/catalog/3/' . $path . $qrystring);
+$json = $this->oauth->getLastResponse();
+
+return $json;
+
+}
+
+}
 
 ?>
