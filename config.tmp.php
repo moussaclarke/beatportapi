@@ -1,22 +1,22 @@
 <?php
 
 /**
-* API Call OAuth Settings
+* API Call OAuth Test Settings
 */
 
 /** Website URL where beatport_api_callback.php is sitting  */
-define('WEBSITE', '');
+define('CALLBACKURL', '');
 
 // Beatport API Consumer Key
-define('CONSUMERKEY', '');
+define('CONSUMER', '');
 
 // Beatport API Secret Key
-define('SECRETKEY', '');
+define('SECRET', '');
 
 // Beatport Login Details
-define('BEATPORTLOGIN', '');
+define('LOGIN', '');
 
-define('BEATPORTPASSWORD', '');
+define('PASSWORD', '');
 
 
 ?>

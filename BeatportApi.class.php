@@ -13,6 +13,11 @@
  *   ?>
  */
 
+// proposed usage:
+// $api = new BeatportApi (array $parameters); // initialise
+// $response = $api->queryApi (array $query); // run the query
+// echo $response; // do something with response
+
 class BeatportApi {
 
 	private $oauth;
@@ -36,19 +41,10 @@ private function buildQuery ($parameters) {
 // generate the query - parameters array with facets, sortBy, perPage, id, url
 
 	$facets=$parameters['facets'];
-
-
 	$sortBy=$parameters['sortBy'];
-
-
 	$perPage=$parameters['perPage'];
-
-
 	$id=$parameters['id'];
-
-
 	$url=$parameters['url'];
-
 
 $qrystring = '';
 
