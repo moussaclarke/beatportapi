@@ -6,8 +6,8 @@ I built this because I needed something Object Oriented and relatively unopinion
 
 This is heavily based on the following people's work:
 
-* Beatport OAuth API by Federico Giust (I originally forked this)
-* Beatport OAuth Connect by Tim Brandwijk (First one was based on this)
+* Beatport OAuth API by Federico Giust (I originally forked this repo)
+* Beatport OAuth Connect by Tim Brandwijk (Federico Giust's script was based on this one)
 * Beatport OAuthConnect by Christian Kolloch (I used this for the Http_oauth groundwork)
 
 ## Aims
