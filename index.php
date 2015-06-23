@@ -1,18 +1,16 @@
 <?php
 //test
-error_reporting(E_ALL);
-ini_set('display_errors', '1');
+error_reporting(E_ALL); // debug
+ini_set('display_errors', '1'); //debug
 include "vendor/autoload.php"; // grab the composer stuff
-include "BeatportApi.class.php";
+include "BeatportApi.class.php"; // include the class
 include "config.php"; // test configuration
 
 $parameters = array (
 	'consumer'=> CONSUMER,
 	'secret' => SECRET,
 	'login' => LOGIN,
-	'password' => PASSWORD,
-	'token' => '',
-	'tokensecret' => '',
+	'password' => PASSWORD
 	);
 
 $query = array (

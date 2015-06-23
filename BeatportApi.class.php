@@ -17,7 +17,7 @@ class BeatportApi {
 	private $oauth;
 
 	function __construct ($parameters) {
-// parameter array consumer, secret, login, password, token, tokensecret, callbackurl
+// parameter array consumer, secret, login, password
 // Set default timezone to beatport timezone
 date_default_timezone_set('America/Los_Angeles'); // this might well screw up other scripts. need to figure out where it's relevant and set it purely for that then reset it to current one. use date_default_timezone_get to get current timezone
 

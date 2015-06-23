@@ -1,177 +1,75 @@
-Beatport API OAuth
-==================
+# Beatport API PHP Class
 
-With this PHP script you will be able to make api calls to the new Beatport API using OAuth and generate a JSON feed.
+A simple PHP class to query the Beatport API.
 
-So for example you can use this on your server and using jQuery ajax to get a JSON object and do anything you need with it on your server.
+I built this because I needed something Object Oriented and relatively unopinionated. This essentially just returns an array which you can then manipulate as you please (for example you could output JSON to use in your own API, build an RSS feed, IFTTT webhooks or whatever else you want)
 
-Requirements
-============
+This is heavily based on the following people's work:
+* Beatport OAuth API by Federico Giust (I originally forked this)
+* Beatport OAuth Connect by Tim Brandwijk (First one was based on this)
+* Beatport OAuthConnect by Christian Kolloch (I used this for the Http_oauth groundwork)
 
-- PHP
-- Beatport API Key and login details
-- PHP OAuth (http://php.net/manual/en/book.oauth.php)
-- MySQL (Optional if you want to log the api calls to a db)
+## Requirements
 
-Install
-=======
+* PHP 5.*
+* Beatport API Key and login details
+* Pear's HTTP_OAuth (via composer)
 
-Once you've installed PHP OAuth, upload this script to your server.
+## Install
 
-Edit config.tmp.php and fill in the constant declarations with the corresponding values
+* Upload it and include the class (See Todo, though)
+* To run the test, you can either fill in your details into config.tmp.php and rename it to config.php, or alternatively comment out the config.php include and replace the constant names in index.php with your details.
+
+## Usage
 
 ```
-<?php
-/**
-* DB Log Settings
-*/
+$parameters = array (
+  'consumer'=> CONSUMER,
+  'secret' => SECRET,
+  'login' => LOGIN,
+  'password' => PASSWORD
+  );
 
-/** MySQL database */
-define('DB_NAME', '');
+$query = array (
+  'facets' => 'labelId:xyz',
+  'url' => 'releases',
+  'perPage' => '150'
+  );
 
-/** MySQL database username */
-define('DB_USER', '');
-
-/** MySQL database password */
-define('DB_PASSWORD', '');
-
-/** MySQL hostname for example: localhost */
-define('DB_HOST', '');
-
-/**
-* API Call OAuth Settings
-*/
-
-/** Website URL where beatport_api_callback.php is sitting  */
-define('WEBSITE', '');
-
-// Beatport API Consumer Key
-define('CONSUMERKEY', '');
-
-// Beatport API Secret Key
-define('SECRETKEY', '');
-
-// Beatport Login Details
-define('BEATPORTLOGIN', '');
-
-define('BEATPORTPASSWORD', '');
+$api = new BeatportApi (array $parameters); // initialise
+$response = $api->queryApi (array $query); // run the query
+echo $response; // do something with response
 
 ?>
 ```
 
-Rename config.tmp.php to config.php
+You can check the [Beatport API documentation](https://oauth-api.beatport.com/) for which queries you can make, although they are currently untested beyond the above, so your mileage may vary (for example I haven't got "sortBy" to work just yet)
 
-There are a couple of query string parameters that you can use to make different calls:
+## Todo
 
-| Parameter | Description |
-|-----------|-------------|
-|facets     |facets to be used in the api call (for example: performerName:Richie+Hawtin) |
-|sortBy     |how do you want the data to be sorted             |
-|perPage    |how many results you want to get per page             |
-|id         |track id (this can be used if no facets is being used)             |
-|url        |path to be concatenated to the call if you want tracks, release, etc             |
-|           | check Beatport API Documentation for more details)             |
+* Store the access token and re-use it until expiry - it shouldn't need to be issued on every single API query. Probably just a file in /data?
+* Get some sanity into the variable / method names
+* Add some proper error catching / messaging
+* Tidy up the code to PSR-2 and comment it properly.
+* Test and document other query types.
+* Composer/Packagist
 
-You can start making calls to a url like this:
+## Contribute
 
-```
-www.yourwebsite.com/beatportapi/beatport_api.php?facets=performerName:Richie+Hawtin&sortBy=publishDate%20desc&perPage=10&url=tracks
-```
+Would be cool to improve this, so feel free to submit bug reports, suggestions and pull requests. Can't guarantee I've got much time to do anything about it.
 
-This will generate the api call to a URL like this:
+## Author
+[Moussa Clarke](http://linkedin.com/moussaclarke). With thanks to the above.
 
-```
-https://oauth-api.beatport.com/catalog/3/tracks?facets=artistName%3ARichie+Hawtin&perPage=10&sortBy=publishDate+DESC
-```
+## Music
+Outside of geekdom, I'm a DJ, producer and label manager, go check it out:
+[Moussa Clarke](http://www.moussaclarke.co.uk)
+[Glamour Punk](http://www.glamourpunk.co.uk)
 
-Which will get you a JSON object like this:
+## License
+[WFTPL](http://www.wtfpl.net/), insofar as those other guys are cool with that.
 
-```
-{
-  "metadata": {
-    "host": "api.beatport.com",
-    "path": "/catalog/tracks",
-    "query": "facets%5B0%5D=artistName%3ARichie%2BHawtin&perPage=10&sortBy=publishDate+DESC",
-    "page": 1,
-    "perPage": 10,
-    "count": 0,
-    "totalPages": 0,
-    "perPageOptions": [
-      {
-        "value": 50,
-        "applyQuery": "facets%5B0%5D=artistName%3ARichie%2BHawtin&perPage=50&sortBy=publishDate+DESC"
-      },
-      {
-        "value": 100,
-        "applyQuery": "facets%5B0%5D=artistName%3ARichie%2BHawtin&perPage=100&sortBy=publishDate+DESC"
-      },
-      {
-        "value": 150,
-        "applyQuery": "facets%5B0%5D=artistName%3ARichie%2BHawtin&perPage=150&sortBy=publishDate+DESC"
-      }
-    ],
-    "facets": {
-      "fields": []
-    },
-    "appliedFacets": [],
-    "dateFilters": [
-      {
-        "name": "today",
-        "startDate": "2014-02-07",
-        "endDate": "2014-02-07",
-        "applyQuery": "facets%5B0%5D=artistName%3ARichie%2BHawtin&perPage=10&sortBy=publishDate+DESC&publishDateStart=2014-02-07&publishDateEnd=2014-02-07",
-        "applied": false
-      },
-      {
-        "name": "yesterday",
-        "startDate": "2014-02-06",
-        "endDate": "2014-02-07",
-        "applyQuery": "facets%5B0%5D=artistName%3ARichie%2BHawtin&perPage=10&sortBy=publishDate+DESC&publishDateStart=2014-02-06&publishDateEnd=2014-02-07",
-        "applied": false
-      },
-      {
-        "name": "weekToDate",
-        "startDate": "2014-01-31",
-        "endDate": "2014-02-07",
-        "applyQuery": "facets%5B0%5D=artistName%3ARichie%2BHawtin&perPage=10&sortBy=publishDate+DESC&publishDateStart=2014-01-31&publishDateEnd=2014-02-07",
-        "applied": false
-      },
-      {
-        "name": "monthToDate",
-        "startDate": "2014-01-07",
-        "endDate": "2014-02-07",
-        "applyQuery": "facets%5B0%5D=artistName%3ARichie%2BHawtin&perPage=10&sortBy=publishDate+DESC&publishDateStart=2014-01-07&publishDateEnd=2014-02-07",
-        "applied": false
-      },
-      {
-        "name": "yearToDate",
-        "startDate": "2013-02-07",
-        "endDate": "2014-02-07",
-        "applyQuery": "facets%5B0%5D=artistName%3ARichie%2BHawtin&perPage=10&sortBy=publishDate+DESC&publishDateStart=2013-02-07&publishDateEnd=2014-02-07",
-        "applied": false
-      },
-      {
-        "custom": true,
-        "name": "customRange",
-        "applied": false,
-        "applyQuery": "facets%5B0%5D=artistName%3ARichie%2BHawtin&perPage=10&sortBy=publishDate+DESC"
-      }
-    ],
-    "rangeFilters": {
-      "bpm": {
-        "custom": true,
-        "rangeName": "bpm",
-        "applied": false,
-        "applyQuery": "facets%5B0%5D=artistName%3ARichie%2BHawtin&perPage=10&sortBy=publishDate+DESC"
-      }
-    },
-    "spellcheck": null
-  },
-  "results": []
-}
-```
 
-Feel free to extend this script to suit your needs.
 
 
 
