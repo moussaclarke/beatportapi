@@ -88,8 +88,3 @@ Outside of geekdom, I'm a DJ, producer and label manager, go check me out:
 
 * [Moussa Clarke](http://www.moussaclarke.co.uk)
 * [Glamour Punk](http://www.glamourpunk.co.uk)
-
-
-
-
-
