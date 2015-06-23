@@ -21,13 +21,12 @@ class BeatportApi {
 // Set default timezone to beatport timezone
 date_default_timezone_set('America/Los_Angeles'); // this might well screw up other scripts. need to figure out where it's relevant and set it purely for that then reset it to current one. use date_default_timezone_get to get current timezone
 
-// Beatport URLs. Note the oauth_callback after the request url. This is needed to catch the verifier string:
-$callbackurl = $parameters["callbackurl"];
+// Beatport URLs. 
 $conskey = $parameters["consumer"]; // Beatport Consumer Key
 $conssec = $parameters["secret"]; // Beatport Consumer Secret
 $beatport_login = $parameters["login"];; // Beatport Username
 $beatport_password = $parameters["password"]; // Beatport Password
-$this->oauth=$this->oAuthDance($callbackurl,$conskey,$conssec,$beatport_login,$beatport_password);
+$this->oauth=$this->oAuthDance($conskey,$conssec,$beatport_login,$beatport_password);
 
 }
 
@@ -71,7 +70,7 @@ return array( "qrystring"=>$qrystring, "path"=>$path, "qryarray" => $qryarray);
 
 }
 
-private function oAuthDance ($callbackurl,$conskey,$conssec,$beatport_login,$beatport_password) {
+private function oAuthDance ($conskey,$conssec,$beatport_login,$beatport_password) {
 
 	/* might need some try/catch e.g. catch (Exception $e) {
     $content = $e->getMessage();
@@ -149,7 +148,7 @@ public function queryApi ($parameters) {
 	$query = $this->buildQuery ($parameters);
 	$path= $query['path'];
 	$qryarray=$query['qryarray'];
-	var_dump($qryarray);
+	//var_dump($qryarray); // debug
   	$request = $this->oauth->sendRequest('https://oauth-api.beatport.com/catalog/3/'. $path , $qryarray);
 	//$request = $this->oauth->sendRequest('https://oauth-api.beatport.com/catalog/3/labels', array('id'=>'26731'));
 	//$request = $this->oauth->sendRequest('https://oauth-api.beatport.com/catalog/3/releases', array('facets'=>'labelId:26731' , 'perPage' => '150'));

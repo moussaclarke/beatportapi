@@ -22,6 +22,7 @@ $query = array (
 
 $api = new BeatportApi ($parameters); // initialise
 $response = $api->queryApi ($query); // run the query
+echo "<pre>"; //prettify the output
 print_r( $response['results']); // do something with response array
-
+echo "</pre>";
 ?>
