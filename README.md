@@ -1,13 +1,20 @@
 # Beatport API PHP Class
 
-A simple PHP class to query the Beatport API.
+A simple PHP class to query the Beatport API via Oauth.
 
 I built this because I needed something Object Oriented and relatively unopinionated. This essentially just returns an array which you can then manipulate as you please (for example you could output JSON to use in your own API, build an RSS feed, IFTTT webhooks or whatever else you want)
 
 This is heavily based on the following people's work:
+
 * Beatport OAuth API by Federico Giust (I originally forked this)
 * Beatport OAuth Connect by Tim Brandwijk (First one was based on this)
 * Beatport OAuthConnect by Christian Kolloch (I used this for the Http_oauth groundwork)
+
+## Aims
+
+* Query the Beatport API
+* Abstract away the OAuth pain
+* Send back a simple array with the results
 
 ## Requirements
 
@@ -23,17 +30,19 @@ This is heavily based on the following people's work:
 ## Usage
 
 ```
+// login parameters
 $parameters = array (
-  'consumer'=> CONSUMER,
-  'secret' => SECRET,
-  'login' => LOGIN,
-  'password' => PASSWORD
+  'consumer'=> 'CONSUMERKEY', // Your Beatport API Key
+  'secret' => 'SECRETKEY', // Your Beatport Secret Key
+  'login' => 'BEATPORTLOGIN', // Your Beatport Login Name
+  'password' => 'BEATPORTPASSWORD' // Your Beatport Password
   );
 
+// query params
 $query = array (
-  'facets' => 'labelId:xyz',
-  'url' => 'releases',
-  'perPage' => '150'
+  'facets' => 'labelId:xyz', // The filter type
+  'url' => 'releases', // The API Method
+  'perPage' => '150' // Number of results per page
   );
 
 $api = new BeatportApi (array $parameters); // initialise
@@ -56,15 +65,16 @@ You can check the [Beatport API documentation](https://oauth-api.beatport.com/) 
 
 ## Contribute
 
-Would be cool to improve this, so feel free to submit bug reports, suggestions and pull requests. Can't guarantee I've got much time to do anything about it.
+Would be cool to improve this, so feel free to submit bug reports, suggestions and pull requests. Can't guarantee I've got enough time to do much though!
 
 ## Author
-[Moussa Clarke](http://linkedin.com/moussaclarke). With thanks to the above.
+Me, [Moussa Clarke](http://linkedin.com/moussaclarke). With thanks to the above.
 
 ## Music
 Outside of geekdom, I'm a DJ, producer and label manager, go check it out:
-[Moussa Clarke](http://www.moussaclarke.co.uk)
-[Glamour Punk](http://www.glamourpunk.co.uk)
+
+* [Moussa Clarke](http://www.moussaclarke.co.uk)
+* [Glamour Punk](http://www.glamourpunk.co.uk)
 
 ## License
 [WFTPL](http://www.wtfpl.net/), insofar as those other guys are cool with that.
