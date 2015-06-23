@@ -47,9 +47,9 @@ $query = array (
   'perPage' => '150' // Number of results per page
   );
 
-$api = new BeatportApi (array $parameters); // initialise
-$response = $api->queryApi (array $query); // run the query
-echo $response; // do something with response
+$api = new BeatportApi ($parameters); // initialise
+$response = $api->queryApi ($query); // run the query
+print_r ($response); // do something with response
 
 ```
 
