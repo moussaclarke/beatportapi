@@ -2,30 +2,32 @@
 
 A simple PHP class to query the Beatport API via Oauth.
 
-I built this because I needed something Object Oriented and relatively unopinionated. This essentially just returns an array which you can then manipulate as you please (for example you could output JSON to use in your own API, build an RSS feed, IFTTT webhooks or whatever else you want)
+I built this because I needed something Object Oriented and relatively unopinionated. This essentially just returns an array which you can then manipulate as you please (for example you could output JSON to use in your own API, build an RSS feed, make a webhook, or whatever else you want)
 
 This is heavily based on the following people's work:
 
-* Beatport OAuth API by Federico Giust (I originally forked this repo)
-* Beatport OAuth Connect by Tim Brandwijk (Federico Giust's script was based on this one)
-* Beatport OAuthConnect by Christian Kolloch (I used this for the Http_oauth groundwork)
+* [Beatport API Json Feed](https://github.com/fedegiust/Beatport-API-JSON-feed) by Federico Giust (I originally forked this repo as a starting point)
+* [Beatport OAuth Connect w/ PECL](https://groups.google.com/forum/#!topic/beatport-api/sEpZUJkaSdo) by Tim Brandwijk (Federico Giust's script was based on this one)
+* [Beatport OAuth Connect w/ PEAR](https://groups.google.com/forum/#!topic/beatport-api/sEpZUJkaSdo) by Christian Kolloch (Also based on Tim Brandwijk's script - I used this for the pear/http_oauth groundwork)
 
 ## Aims
 
-* Query the Beatport API
+* Login and query the Beatport API
 * Abstract away the OAuth pain
 * Send back a simple array with the results
+* Don't rely on too many esoteric server-side extensions (e.g. PECL) which can be a non-starter on cheap/shared hosts
 
 ## Requirements
 
-* PHP 5.*
-* Beatport API Key and login details
+* PHP 5.4+ (Might work on earlier versions, but that's what I've been using)
+* Beatport API Key and login details (You'll need to request those from Beatport)
 * Pear's HTTP_OAuth (via composer)
 
 ## Install
 
-* Upload it and include the class (See Todo, though)
-* To run the test, you can either fill in your details into config.tmp.php and rename it to config.php, or alternatively comment out the config.php include and replace the constant names in index.php with your details.
+* Run composer install to get the dependencies
+* Include the class (See Todo, though)
+* The file example.php is just a quick test/example - to run it you can either fill in your details into config.tmp.php and rename it to config.php, or alternatively comment out the config.php include line, and replace the constant names in example.php with your details.
 
 ## Usage
 
@@ -49,14 +51,13 @@ $api = new BeatportApi (array $parameters); // initialise
 $response = $api->queryApi (array $query); // run the query
 echo $response; // do something with response
 
-?>
 ```
 
-You can check the [Beatport API documentation](https://oauth-api.beatport.com/) for which queries you can make, although they are currently untested beyond the above, so your mileage may vary (for example I haven't got "sortBy" to work just yet)
+You can check the [Beatport API documentation](https://oauth-api.beatport.com/) for which queries you can make and which parameters are required, although they are currently untested beyond the above example, so your mileage may vary (for example I haven't even got "sortBy" to work just yet)
 
 ## Todo
 
-* Store the access token and re-use it until expiry - it shouldn't need to be issued on every single API query. Probably just a file in /data?
+* Store the access token somewhere and re-use it until expiry - we shouldn't need to issue a new one for every single API query. Probably just a file in /data?
 * Get some sanity into the variable / method names
 * Add some proper error catching / messaging
 * Tidy up the code to PSR-2 and comment it properly.
@@ -71,7 +72,7 @@ Would be cool to improve this, so feel free to submit bug reports, suggestions a
 Me, [Moussa Clarke](http://linkedin.com/moussaclarke). With thanks to the above.
 
 ## Music
-Outside of geekdom, I'm a DJ, producer and label manager, go check it out:
+Outside of geekdom, I'm a DJ, producer and label manager, go check me out:
 
 * [Moussa Clarke](http://www.moussaclarke.co.uk)
 * [Glamour Punk](http://www.glamourpunk.co.uk)

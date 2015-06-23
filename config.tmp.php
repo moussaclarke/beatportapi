@@ -1,7 +1,7 @@
 <?php
 
 /**
-* API Call OAuth Test Settings
+* API Call OAuth Test Settings - fill in your details below and rename this to config.php if you want to run example.php You can safely delete it otherwise.
 */
 
 // Beatport API Consumer Key
