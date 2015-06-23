@@ -1,8 +1,12 @@
 # Beatport API PHP Class
 
-A simple PHP class to query the Beatport API via Oauth.
+A simple PHP class to query the Beatport API via Oauth, server side, without any UI.
 
-I built this because I needed something Object Oriented and relatively unopinionated. This essentially just returns an array which you can then manipulate as you please (for example you could output JSON to use in your own API, build an RSS feed, make a webhook, or whatever else you want)
+I built this because I needed something Object Oriented and relatively unopinionated.
+
+The use case is for a server to server context - it's not trying to handle any UI or manual login/confirmation views. I'm building a simple Beatport RSS webapp for my label, which needs to log in to the Beatport API using my own credentials.
+
+The class essentially just returns an array which you can then manipulate as you please (for example you could then output JSON to use in your own API, build an RSS feed, make a webhook, or whatever else you want)
 
 This is heavily based on the following people's work:
 
@@ -14,7 +18,7 @@ This is heavily based on the following people's work:
 
 * Login and query the Beatport API
 * Abstract away the OAuth pain
-* Send back a simple array with the results
+* Send back a simple array with the query results
 * Don't rely on too many esoteric server-side extensions (e.g. PECL) which can be a non-starter on cheap/shared hosts
 
 ## Requirements
@@ -74,7 +78,7 @@ By [Moussa Clarke](https://github.com/moussaclarke/)
 
 ## Contribute
 
-Would be cool to improve this, so feel free to submit bug reports, suggestions and pull requests. Can't guarantee I've got enough time to do much though!
+Would be cool to improve this, so feel free to submit bug reports, suggestions and pull requests. Can't guarantee I've got enough time to do very much though! Alternatively just fork it and make your own thing.
 
 ## License
 [WFTPL](http://www.wtfpl.net/), insofar as those other guys are cool with that.
