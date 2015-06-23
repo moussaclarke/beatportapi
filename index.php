@@ -2,6 +2,7 @@
 //test
 error_reporting(E_ALL);
 ini_set('display_errors', '1');
+include "vendor/autoload.php"; // grab the composer stuff
 include "BeatportApi.class.php";
 include "config.php"; // test configuration
 
@@ -12,11 +13,17 @@ $parameters = array (
 	'password' => PASSWORD,
 	'token' => '',
 	'tokensecret' => '',
-	'callbackurl' => CALLBACKURL
+	);
+
+$query = array (
+	'facets' => 'labelId:26731',
+	'url' => 'releases',
+	//'sortBy' => 'publishDate%BDESC', // not working, not sure why
+	'perPage' => '150'
 	);
 
 $api = new BeatportApi ($parameters); // initialise
 $response = $api->queryApi ($query); // run the query
-echo $response; // do something with response
+print_r( $response['results']); // do something with response
 
 ?>
