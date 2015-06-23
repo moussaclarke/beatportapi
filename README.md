@@ -55,6 +55,10 @@ print_r ($response); // do something with response
 
 You can check the [Beatport API documentation](https://oauth-api.beatport.com/) for which queries you can make and which parameters are required, although they are currently untested beyond the above example, so your mileage may vary (for example I haven't even got "sortBy" to work just yet)
 
+## Disclaimer
+
+Totally and utterly alpha, and likely to break at any point. Not guaranteed to work as intended in any way, so use at your own risk.
+
 ## Todo
 
 * Store the access token somewhere and re-use it until expiry - we shouldn't need to issue a new one for every single API query. Probably just a file in /data?
@@ -64,21 +68,22 @@ You can check the [Beatport API documentation](https://oauth-api.beatport.com/) 
 * Test and document other query types.
 * Composer/Packagist
 
+## Maintained
+
+By [Moussa Clarke](https://github.com/moussaclarke/)
+
 ## Contribute
 
 Would be cool to improve this, so feel free to submit bug reports, suggestions and pull requests. Can't guarantee I've got enough time to do much though!
 
-## Author
-Me, [Moussa Clarke](http://linkedin.com/moussaclarke). With thanks to the above.
+## License
+[WFTPL](http://www.wtfpl.net/), insofar as those other guys are cool with that.
 
 ## Music
 Outside of geekdom, I'm a DJ, producer and label manager, go check me out:
 
 * [Moussa Clarke](http://www.moussaclarke.co.uk)
 * [Glamour Punk](http://www.glamourpunk.co.uk)
-
-## License
-[WFTPL](http://www.wtfpl.net/), insofar as those other guys are cool with that.
 
 
 
