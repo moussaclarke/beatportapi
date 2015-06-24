@@ -112,7 +112,6 @@ class BeatportApi {
         curl_setopt($curl_connection_bp, CURLOPT_URL, $auth_submiturl);
         curl_setopt($curl_connection_bp, CURLOPT_CONNECTTIMEOUT, 0);
         curl_setopt($curl_connection_bp, CURLOPT_USERAGENT, 'Mozilla/5.0 (Windows; U; Windows NT6.0; en-US; rv:1.8.1.11) Gecko/20071127 Firefox/2.0.0.11');
-        curl_setopt($curl_connection_bp, CURLOPT_REFERER, $curl_connection_bp);
         curl_setopt($curl_connection_bp, CURLOPT_AUTOREFERER, true);
         curl_setopt($curl_connection_bp, CURLOPT_RETURNTRANSFER, true);
         curl_setopt($curl_connection_bp, CURLOPT_TIMEOUT, 60);
@@ -121,7 +120,8 @@ class BeatportApi {
         curl_setopt($curl_connection_bp, CURLOPT_SSL_VERIFYHOST, false);
         curl_setopt($curl_connection_bp, CURLOPT_VERBOSE, false);
         curl_setopt($curl_connection_bp, CURLOPT_HTTPAUTH, CURLAUTH_DIGEST);
-        curl_setopt($curl_connection_bp, CURLOPT_REFERER, $curl_connection_bp);
+        $curl_referer  = ( $_SERVER["HTTPS"] != 'on' ) ? 'http://'.$_SERVER["SERVER_NAME"] :  'https://'.$_SERVER["SERVER_NAME"];
+        curl_setopt($curl_connection_bp, CURLOPT_REFERER, $curl_referer);
         curl_setopt($curl_connection_bp, CURLOPT_FAILONERROR, 0);
         curl_setopt($curl_connection_bp, CURLOPT_POST, true);
         curl_setopt($curl_connection_bp, CURLOPT_POSTFIELDS, $post_string);
