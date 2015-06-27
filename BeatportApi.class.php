@@ -1,7 +1,8 @@
 <?php
 
 /**
- * This is heavily based on:
+ * By Moussa Clarke (https://github.com/moussaclarke/)
+ * Based on:
  * Beatport OAuth API by Federico Giust
  * Beatport OAuth Connect by Tim Brandwijk
  * Beatport OAuthConnect by Christian Kolloch.
@@ -48,8 +49,7 @@ class BeatportApi {
             $qryarray['id'] = $id;
         } //isset($id) && strlen($id) > 0
         else {
-            echo 'Parameter missing';
-            exit;
+            throw new Exception ('Parameter missing');
         }
         if (isset($sortBy) && strlen($sortBy) > 0) {
             $qrystring .= '&sortBy=' . urlencode($sortBy);
@@ -129,30 +129,24 @@ class BeatportApi {
         $beatport_response = curl_exec($curl_connection_bp);
 
         /*
-         * Step 4: Use verifier string to request the Access Token
+         * Step 4: Use verifier string to request and set the Access Token
          */
         $oauth_exploded = array();
         parse_str($beatport_response, $oauth_exploded);
         curl_close($curl_connection_bp);
-
-        /*
-         * Step 5: Set Access Token for further requests
-         */
         $oauth->getAccessToken('https://oauth-api.beatport.com/identity/1/oauth/access-token', $oauth_exploded['oauth_verifier']);
 
         return $oauth;
     }
 
     public function queryApi($parameters) {
+        // parameters array with facets, sortBy, perPage, id, url
         $query    = $this->buildQuery($parameters);
         $path     = $query['path'];
         $qryarray = $query['qryarray'];
         //var_dump($qryarray); // debug
         $request  = $this->oauth->sendRequest('https://oauth-api.beatport.com/catalog/3/' . $path, $qryarray);
-        //$request = $this->oauth->sendRequest('https://oauth-api.beatport.com/catalog/3/labels', array('id'=>'26731'));
-        //$request = $this->oauth->sendRequest('https://oauth-api.beatport.com/catalog/3/releases', array('facets'=>'labelId:26731' , 'perPage' => '150'));
         $json     = $request->getBody();
-
         return json_decode($json, true);
     }
 }
