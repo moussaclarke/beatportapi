@@ -57,7 +57,7 @@ print_r ($response); // do something with response
 
 ```
 
-You can check the [Beatport API documentation](https://oauth-api.beatport.com/) for which queries you can make and which parameters are required, although they are currently untested beyond the above example, so your mileage may vary (for example I haven't even got "sortBy" to work just yet)
+You can check the [Beatport API documentation](https://oauth-api.beatport.com/) for which queries you can make and which parameters are required, although they are currently untested much beyond the above example, and not everything is documented, so your mileage may vary.
 
 ## Disclaimer
 
