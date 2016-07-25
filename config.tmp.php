@@ -14,6 +14,3 @@ define('SECRET', '');
 define('LOGIN', '');
 
 define('PASSWORD', '');
-
-
-?>

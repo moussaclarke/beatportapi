@@ -2,10 +2,11 @@
     "repositories": [
         {
             "type": "pear",
-            "url": "http://pear.php.net"
+            "url": "https://pear.php.net"
         }
     ],
     "require": {
-        "pear-pear.php.net/HTTP_OAuth": "*"
+        "pear-pear.php.net/HTTP_OAuth": "*",
+        "curl/curl": "^1.4"
     }
 }

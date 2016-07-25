@@ -1,10 +1,10 @@
 # Beatport API PHP Class
 
-A simple PHP class to query the Beatport API via Oauth, server side, without any UI.
+A simple PHP class to query the Beatport API via Oauth, server side.
 
 I built this because I needed something Object Oriented and relatively unopinionated.
 
-The use case is for a server to server context - it's not trying to handle any UI or manual login/confirmation views. I'm building a simple Beatport RSS webapp for my label, which needs to log in to the Beatport API using my own credentials.
+The use case is for a server to server context - it's not trying to handle any client side login/confirmation process. For example I built a simple Beatport RSS link for my label, which needs to log in to the Beatport API using my own credentials.
 
 The class essentially just returns an array which you can then manipulate as you please (for example you could then output JSON to use in your own API, build an RSS feed, make a webhook, or whatever else you want)
 
@@ -26,6 +26,7 @@ This is heavily based on the following people's work:
 * PHP 5.4+ (Might work on earlier versions, but that's what I've been using)
 * Beatport API Key and login details (You'll need to request those from Beatport)
 * Pear's HTTP_OAuth (via composer)
+* phpmod's curl class (via composer)
 
 ## Install
 
@@ -65,7 +66,7 @@ Totally and utterly alpha, and likely to break at any point. Not guaranteed to w
 
 ## Todo
 
-* Store the access token somewhere and re-use it until expiry - we shouldn't need to issue a new one for every single API query. Probably just a file in /data?
+* Store the access token somewhere and re-use it until expiry - we shouldn't need to issue a new one for every single API query. Maybe just a file in /data?
 * Get some sanity into the variable / method names
 * Add some proper error catching / messaging
 * Tidy up the code to PSR-2 and comment it properly.
