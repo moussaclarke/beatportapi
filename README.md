@@ -30,13 +30,12 @@ This is heavily based on the following people's work:
 
 ## Install
 
-* Run composer install to get the dependencies
-* Include the class (See Todo, though)
-* The file example.php is just a quick test/example - to run it you can either fill in your details into config.tmp.php and rename it to config.php, or alternatively comment out the config.php include line, and replace the constant names in example.php with your details.
+* composer require moussaclarke/beatportapi
 
 ## Usage
 
 ```
+use MoussaClarke\BeatportApi;
 // login parameters
 $parameters = array (
   'consumer'=> 'CONSUMERKEY', // Your Beatport API Key

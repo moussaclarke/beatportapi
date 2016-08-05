@@ -1,4 +1,5 @@
 <?php
+
 /**
  * This is heavily based on:
  * Beatport OAuth API by Federico Giust
@@ -11,6 +12,8 @@
 // $api = new BeatportApi (array $parameters); // initialise
 // $response = $api->queryApi (array $query); // run the query
 // echo $response; // do something with response
+
+namespace MoussaClarke;
 
 class BeatportApi
 {
@@ -76,16 +79,16 @@ class BeatportApi
         $auth_submiturl = 'https://oauth-api.beatport.com/identity/1/oauth/authorize-submit';
         $acc_url        = 'https://oauth-api.beatport.com/identity/1/oauth/access-token';
 
-        $http_request = new HTTP_Request2(null, HTTP_Request2::METHOD_GET, array(
+        $http_request = new \HTTP_Request2(null, \HTTP_Request2::METHOD_GET, array(
             'ssl_verify_peer' => false,
             'ssl_verify_host' => false,
         ));
         $http_request->setHeader('Accept-Encoding', '.*');
 
-        $consumer_request = new HTTP_OAuth_Consumer_Request();
+        $consumer_request = new \HTTP_OAuth_Consumer_Request();
         $consumer_request->accept($http_request);
 
-        $oauth = new HTTP_OAuth_Consumer($conskey, $conssec);
+        $oauth = new \HTTP_OAuth_Consumer($conskey, $conssec);
         $oauth->accept($consumer_request);
 
         /**
