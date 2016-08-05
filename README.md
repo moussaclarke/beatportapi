@@ -25,12 +25,28 @@ This is heavily based on the following people's work:
 
 * PHP 5.4+ (Might work on earlier versions, but that's what I've been using)
 * Beatport API Key and login details (You'll need to request those from Beatport)
-* Pear's HTTP_OAuth (via composer)
+* Pear's HTTP_OAuth (via composer - see install)
 * phpmod's curl class (via composer)
 
 ## Install
+* This currently relies on older versions of HTTP_OAuth and dependencies, which are not straightforward to get from Packagist. These are therefore fetched from Pear, and there are some legacy non-secure http calls. You will therefore need to add the following to your project's composer.json before installing:
 
-* composer require moussaclarke/beatportapi
+```
+"config" : {
+        "secure-http": false
+    },
+"repositories": [{
+        "type": "pear",
+        "url": "https://pear.php.net"
+    }]
+
+```
+
+* You can then do:
+
+```
+composer require moussaclarke/beatportapi
+```
 
 ## Usage
 
@@ -68,9 +84,9 @@ Totally and utterly alpha, and likely to break at any point. Not guaranteed to w
 * Store the access token somewhere and re-use it until expiry - we shouldn't need to issue a new one for every single API query. Maybe just a file in /data?
 * Get some sanity into the variable / method names
 * Add some proper error catching / messaging
-* Tidy up the code to PSR-2 and comment it properly.
 * Test and document other query types.
-* Composer/Packagist
+* Troubleshoot/debug with latest version of Pear libraries so they can be fetched from Packagist, or replace them with something else.
+
 
 ## Maintained
 
