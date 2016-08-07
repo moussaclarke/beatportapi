@@ -25,7 +25,6 @@ class BeatportApi
 {
 
     private $client; // http client
-    private $curl;
     private $logger; // a monolog instance for debugging
     private $callbackuri; // a callback uri
 
@@ -40,7 +39,7 @@ class BeatportApi
         $beatportpassword  = $parameters["password"]; // Beatport Password
         $this->callbackuri = $parameters["callbackuri"]; //  callback uri
 
-        // Logger instance if required
+        // pass in monolog Logger instance if required
         $this->logger = $logger;
 
         // do the oauth dance
@@ -67,25 +66,22 @@ class BeatportApi
     private function oAuthDance($consumerkey, $consumersecret, $beatportlogin, $beatportpassword)
     {
 
-        // stack instance
-        $stack = HandlerStack::create();
-        $stack = $this->getLogger($stack); // add logger if need be
 
         // Beatport URLs
         $baseuri = 'https://oauth-api.beatport.com';
 
         // First Leg
 
-        // Set up client, passing in stack as a reference
-        $client = new Client(['base_uri' => $baseuri, 'auth' => 'oauth', 'handler' => &$stack]);
-
-        // Create Oauth and pass it to the stack
+        // Create Oauth instance and get the stack
         $oauth = new Oauth1([
             'consumer_key'    => $consumerkey,
             'consumer_secret' => $consumersecret,
         ]);
 
-        $stack->push($oauth);
+        $stack=$this->getStack ($oauth);
+
+        // Set up http client, passing in stack as a reference
+        $client = new Client(['base_uri' => $baseuri, 'auth' => 'oauth', 'handler' => &$stack]);
 
         // request the token
         $response = $client->post('identity/1/oauth/request-token',
@@ -112,7 +108,7 @@ class BeatportApi
             ]
         );
 
-        // parse the callback request query string and put it into an array as it shouldn't over-write last params
+        // parse the callback request query string and put it into an array so it doesn't over-write last params
         $params = $lastrequesturi->getQuery();
         $result = array();
         parse_str($params, $result);
@@ -125,10 +121,7 @@ class BeatportApi
 
         // Third and final leg
 
-        // lets create a new stack and add oauth with our temp token & token secret
-        $stack = HandlerStack::create();
-        $stack = $this->getLogger($stack); // add logger if need be
-
+        // lets create a new oauth with our temp token & token secret & update the stack
         $oauth = new Oauth1([
             'consumer_key'    => $consumerkey,
             'consumer_secret' => $consumersecret,
@@ -136,7 +129,7 @@ class BeatportApi
             'token_secret'    => $oauth_token_secret,
         ]);
 
-        $stack->push($oauth);
+        $stack=$this->getStack ($oauth);
 
         // Let's get the final access token
         $response = $client->post('identity/1/oauth/access-token',
@@ -149,10 +142,7 @@ class BeatportApi
         $params = urldecode((string) $response->getBody());
         parse_str($params); //oauth_token, oauth_token_secret, session_id, oauth_callback_confirmed
 
-        // let's create new stack and oauth for subsequent requests
-        $stack = HandlerStack::create();
-        $stack = $this->getLogger($stack); // add logger if need be
-
+        // let's create final oauth /stack for subsequent requests
         $oauth = new Oauth1([
             'consumer_key'    => $consumerkey,
             'consumer_secret' => $consumersecret,
@@ -160,14 +150,22 @@ class BeatportApi
             'token_secret'    => $oauth_token_secret,
         ]);
 
-        $stack->push($oauth);
+        $stack=$this->getStack ($oauth);
 
         return $client;
 
     }
 
+    private function getStack ($oauth) {
+        // send back a handlerstack instance 
+        $stack = HandlerStack::create();
+        $stack = $this->getLogger($stack); // get logger if exists
+        $stack->push($oauth);
+        return $stack;
+    }
+
     private function getLogger($stack)
-    // this is in here for debugging purposes, you can ignore it
+    // this is in here for dev/debugging purposes
     {
         if ($this->logger) {
 
