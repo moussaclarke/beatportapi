@@ -66,7 +66,6 @@ class BeatportApi
     private function oAuthDance($consumerkey, $consumersecret, $beatportlogin, $beatportpassword)
     {
 
-
         // Beatport URLs
         $baseuri = 'https://oauth-api.beatport.com';
 
@@ -92,12 +91,13 @@ class BeatportApi
 
         // parse the response
         $params = urldecode((string) $response->getBody());
-        parse_str($params); //oauth_token, oauth_token_secret, oauth_callback_confirmed
+        $result=[];
+        parse_str($params, $result); //oauth_token, oauth_token_secret, oauth_callback_confirmed
 
         // Second Leg
 
         // prepare the args
-        $postargs = ['oauth_token' => $oauth_token, 'username' => $beatportlogin, 'password' => $beatportpassword, 'submit' => 'Login'];
+        $postargs = ['oauth_token' => $result['oauth_token'], 'username' => $beatportlogin, 'password' => $beatportpassword, 'submit' => 'Login'];
 
         // submit credentials
         $response = $client->post('identity/1/oauth/authorize-submit',
@@ -108,13 +108,13 @@ class BeatportApi
             ]
         );
 
-        // parse the callback request query string and put it into an array so it doesn't over-write last params
+        // parse the callback request query string and put it into a different array so it doesn't over-write last params
         $params = $lastrequesturi->getQuery();
-        $result = array();
-        parse_str($params, $result);
+        $result2=[];
+        parse_str($params, $result2); // oauth_token, oauth_verifier
 
         // we should check if the tokens match, crappy placeholder implementation for now, but whatevs
-        if ($result['oauth_token'] != $oauth_token) {
+        if ($result['oauth_token'] != $result2['oauth_token']) {
             echo 'tokens dont match. aborting.';
             die();
         }
@@ -125,8 +125,8 @@ class BeatportApi
         $oauth = new Oauth1([
             'consumer_key'    => $consumerkey,
             'consumer_secret' => $consumersecret,
-            'token'           => $result['oauth_token'],
-            'token_secret'    => $oauth_token_secret,
+            'token'           => $result2['oauth_token'],
+            'token_secret'    => $result['oauth_token_secret'],
         ]);
 
         $stack=$this->getStack ($oauth);
@@ -134,20 +134,21 @@ class BeatportApi
         // Let's get the final access token
         $response = $client->post('identity/1/oauth/access-token',
             ['form_params' => [
-                'oauth_verifier' => $result['oauth_verifier'],
+                'oauth_verifier' => $result2['oauth_verifier'],
             ],
             ]);
 
         // And parse the response
         $params = urldecode((string) $response->getBody());
-        parse_str($params); //oauth_token, oauth_token_secret, session_id, oauth_callback_confirmed
+        $result=[];
+        parse_str($params, $result); //oauth_token, oauth_token_secret, session_id, oauth_callback_confirmed
 
         // let's create final oauth /stack for subsequent requests
         $oauth = new Oauth1([
             'consumer_key'    => $consumerkey,
             'consumer_secret' => $consumersecret,
-            'token'           => $oauth_token,
-            'token_secret'    => $oauth_token_secret,
+            'token'           => $result['oauth_token'],
+            'token_secret'    => $result['oauth_token_secret'],
         ]);
 
         $stack=$this->getStack ($oauth);
