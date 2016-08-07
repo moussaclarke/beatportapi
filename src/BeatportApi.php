@@ -80,7 +80,7 @@ class BeatportApi
         // Set up http client, passing in stack as a reference
         $client = new Client(['base_uri' => $baseuri, 'auth' => 'oauth', 'handler' => &$stack]);
 
-        // request the token, with out of bound callback, so no redirect
+        // request the token, with out of band callback, so no redirect
         $response = $client->post('identity/1/oauth/request-token',
             ['form_params' => [
                 'oauth_callback' => 'oob',
