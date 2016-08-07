@@ -2,13 +2,13 @@
 
 A simple PHP class to query the Beatport API via Oauth, server side.
 
-The use case is for a server to server context - for example I built a simple Beatport RSS link for my label. The library handles the three legged auth flow, submitting what would be the client side login/confirmation process via the server. Beatport does advertise a simpler Direct Access Token, but you need additional permissions, and this library works without that.
+The use case is for a server to server context - for example I used it to build a simple Beatport RSS feed for my label. The library handles the three legged Oauth1a flow, submitting what would be the client side login/confirmation process via the server. Beatport does advertise a simpler Direct Access Token, but you need additional permissions, and this library works without that.
 
 The class essentially just returns an array which you can then manipulate as you please.
 
 This is originally based on the following people's work:
 
-* [Beatport API Json Feed](https://github.com/fedegiust/Beatport-API-JSON-feed) by Federico Giust (I originally forked this repo as a starting point)
+* [Beatport API Json Feed](https://github.com/fedegiust/Beatport-API-JSON-feed) by Federico Giust (I forked this repo as a starting point)
 * [Beatport OAuth Connect w/ PECL](https://groups.google.com/forum/#!topic/beatport-api/sEpZUJkaSdo) by Tim Brandwijk (Federico Giust's script was based on this one)
 * [Beatport OAuth Connect w/ PEAR](https://groups.google.com/forum/#!topic/beatport-api/sEpZUJkaSdo) by Christian Kolloch (Also based on Tim Brandwijk's script)
 

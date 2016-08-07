@@ -102,7 +102,7 @@ class BeatportApi
             ['form_params' => $postargs]
         );
 
-        // parse the callback request query string and put it into a different array so it doesn't over-write last params
+        // parse the response and put it into a different array so it doesn't over-write last lot
         $params = urldecode((string) $response->getBody());
         $result2=[];
         parse_str($params, $result2); // oauth_token, oauth_verifier
