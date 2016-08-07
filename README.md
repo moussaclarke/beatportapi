@@ -34,21 +34,22 @@ composer require moussaclarke/beatportapi
 
 ```
 use MoussaClarke\BeatportApi;
-// login parameters
-$parameters = array (
+
+// auth parameters
+$parameters = [
   'consumer'=> 'CONSUMERKEY', // Your Beatport API Key
   'secret' => 'SECRETKEY', // Your Beatport Secret Key
   'login' => 'BEATPORTLOGIN', // Your Beatport Login Name
   'password' => 'BEATPORTPASSWORD' // Your Beatport Password
   'callbackuri' => 'http://www.example.com' // This should be a uri on your server, it doesn't need to do anything except receive the request
-  );
+  ];
 
-// query params
-$query = array (
+// query parameters
+$query = [
   'facets' => 'labelId:xyz', // The filter type
   'url' => 'releases', // The API Method
   'perPage' => '150' // Number of results per page
-  );
+  ];
 
 $api = new BeatportApi ($parameters); // initialise
 $response = $api->queryApi ($query); // run the query
