@@ -156,7 +156,8 @@ class BeatportApi
 
     }
 
-    private function getStack ($oauth) {
+    private function getStack ($oauth)
+    {
         // send back a handlerstack instance 
         $stack = HandlerStack::create();
         $stack = $this->getLogger($stack); // get logger if exists
@@ -168,13 +169,13 @@ class BeatportApi
     // this is in here for dev/debugging purposes
     {
         if ($this->logger) {
-
             $loggingmiddleware = Middleware::log(
                 $this->logger,
                 new MessageFormatter('{request} - {response}')
             );
             $stack->push($loggingmiddleware);
         }
+        
         return $stack;
     }
 
