@@ -47,7 +47,7 @@ $parameters = [
 // query parameters
 $query = [
   'facets' => 'labelId:xyz', // The filter type
-  'url' => 'releases', // The API Method
+  'method' => 'releases', // The Beatport API Method
   'perPage' => '150' // Number of results per page
   ];
 

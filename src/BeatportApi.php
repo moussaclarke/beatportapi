@@ -47,33 +47,20 @@ class BeatportApi
         $this->client = $this->oAuthDance($consumerkey, $consumersecret, $beatportlogin, $beatportpassword);
     }
 
-    private function buildQuery($parameters)
+    public function queryApi($parameters)
     {
-        // generate the query from parameters array - facets, sortBy, perPage, id, url, etc
-        // todo: some error checking (e.g. have we had minimum params?) // error feedback
-        // otherwise, api itself should handle validation, but we need to feedback any api error response
+        // parameters array with facets, sortBy, perPage, id, url, etc
+        $method = $parameters['method']; // this is the API method, e.g. tracks, releases etc
+        unset($parameters['method']); // unset it as it's not a query param
 
-        $path = $parameters['url']; // this is the API method, e.g. tracks, releases etc
-        unset($parameters['url']); // get rid of it as it's not a query param
+        // make the api call
+        $response = $this->client->get('catalog/3/' . $method, ['query' => $parameters]);
 
-        //initialise for the iteration
-        $qryarray  = array();
-        $qrystring = '';
-        $i         = 0;
+        // get the response
+        $json = $response->getBody();
 
-        // iterate through and build the query vars
-        foreach ($parameters as $name => $value) {
-            $qrystring .= $i == 0 ? '?' : '&'; // ? on first param, & for rest
-            $qrystring .= $name . "=" . urlencode($value);
-            $qryarray[$name] = $value;
-            $i++;
-        }
-
-        return array(
-            'qrystring' => $qrystring,
-            'path'      => $path,
-            'qryarray'  => $qryarray,
-        );
+        // return an array
+        return json_decode($json, true);
 
     }
 
@@ -191,21 +178,6 @@ class BeatportApi
             $stack->push($loggingmiddleware);
         }
         return $stack;
-    }
-
-    public function queryApi($parameters)
-    {
-        // parameters array with facets, sortBy, perPage, id, url, etc
-        $query    = $this->buildQuery($parameters);
-        $path     = $query['path'];
-        $qryarray = $query['qryarray'];
-
-        $response = $this->client->get('catalog/3/' . $path, ['query' => $qryarray]);
-
-        $json = $response->getBody();
-
-        return json_decode($json, true);
-
     }
 
 }
