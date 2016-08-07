@@ -29,22 +29,22 @@ class BeatportApi
     private $logger; // a monolog instance for debugging
     private $callbackuri; // a callback uri
 
-    public function __construct($parameters, $logger = NULL)
+    public function __construct($parameters, $logger = null)
     {
         // parameter array consumer, secret, login, password, callback
 
         // Beatport credentials and callback uri
-        $consumerkey    = $parameters["consumer"]; // Beatport Consumer Key
-        $consumersecret = $parameters["secret"]; // Beatport Consumer Secret
-        $beatportlogin  = $parameters["login"]; // Beatport Username
-        $beatportpassword = $parameters["password"]; // Beatport Password
+        $consumerkey       = $parameters["consumer"]; // Beatport Consumer Key
+        $consumersecret    = $parameters["secret"]; // Beatport Consumer Secret
+        $beatportlogin     = $parameters["login"]; // Beatport Username
+        $beatportpassword  = $parameters["password"]; // Beatport Password
         $this->callbackuri = $parameters["callbackuri"]; //  callback uri
-        
+
         // Logger instance if required
         $this->logger = $logger;
 
         // do the oauth dance
-        $this->client      = $this->oAuthDance($consumerkey, $consumersecret, $beatportlogin, $beatportpassword);
+        $this->client = $this->oAuthDance($consumerkey, $consumersecret, $beatportlogin, $beatportpassword);
     }
 
     private function buildQuery($parameters)
@@ -95,36 +95,35 @@ class BeatportApi
         // Create Oauth and pass it to the stack
         $oauth = new Oauth1([
             'consumer_key'    => $consumerkey,
-            'consumer_secret' => $consumersecret
+            'consumer_secret' => $consumersecret,
         ]);
 
         $stack->push($oauth);
 
         // request the token
         $response = $client->post('identity/1/oauth/request-token',
-            ['form_params' =>[
-            'oauth_callback' => $this->callbackuri
-            ]
+            ['form_params' => [
+                'oauth_callback' => $this->callbackuri,
+            ],
             ]);
 
         // parse the response
         $params = urldecode((string) $response->getBody());
         parse_str($params); //oauth_token, oauth_token_secret, oauth_callback_confirmed
 
-
         // Second Leg
 
         // prepare the args
-        $postargs= ['oauth_token' => $oauth_token, 'username' => $beatportlogin, 'password' => $beatportpassword, 'submit'=>'Login'];
+        $postargs = ['oauth_token' => $oauth_token, 'username' => $beatportlogin, 'password' => $beatportpassword, 'submit' => 'Login'];
 
         // submit credentials
         $response = $client->post('identity/1/oauth/authorize-submit',
             ['form_params' => $postargs,
-            'on_stats' => function (TransferStats $stats) use (&$lastrequesturi) {
-                $lastrequesturi = $stats->getEffectiveUri();
-            }
+                'on_stats'     => function (TransferStats $stats) use (&$lastrequesturi) {
+                    $lastrequesturi = $stats->getEffectiveUri();
+                },
             ]
-            );
+        );
 
         // parse the callback request query string and put it into an array as it shouldn't over-write last params
         $params = $lastrequesturi->getQuery();
@@ -146,17 +145,17 @@ class BeatportApi
         $oauth = new Oauth1([
             'consumer_key'    => $consumerkey,
             'consumer_secret' => $consumersecret,
-            'token' => $result['oauth_token'],
-            'token_secret' => $oauth_token_secret
+            'token'           => $result['oauth_token'],
+            'token_secret'    => $oauth_token_secret,
         ]);
 
         $stack->push($oauth);
 
         // Let's get the final access token
-        $response = $client->post('identity/1/oauth/access-token', 
+        $response = $client->post('identity/1/oauth/access-token',
             ['form_params' => [
-            'oauth_verifier' => $result['oauth_verifier']
-            ]
+                'oauth_verifier' => $result['oauth_verifier'],
+            ],
             ]);
 
         // And parse the response
@@ -170,8 +169,8 @@ class BeatportApi
         $oauth = new Oauth1([
             'consumer_key'    => $consumerkey,
             'consumer_secret' => $consumersecret,
-            'token' => $oauth_token,
-            'token_secret' => $oauth_token_secret
+            'token'           => $oauth_token,
+            'token_secret'    => $oauth_token_secret,
         ]);
 
         $stack->push($oauth);
@@ -185,13 +184,13 @@ class BeatportApi
     {
         if ($this->logger) {
 
-        $loggingmiddleware = Middleware::log(
+            $loggingmiddleware = Middleware::log(
                 $this->logger,
                 new MessageFormatter('{request} - {response}')
             );
-        $stack->push($loggingmiddleware);
-    }
-    return $stack;
+            $stack->push($loggingmiddleware);
+        }
+        return $stack;
     }
 
     public function queryApi($parameters)
