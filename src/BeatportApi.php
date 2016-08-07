@@ -1,7 +1,6 @@
 <?php
-
 /**
- * This is heavily based on:
+ * This is originally based on:
  * Beatport OAuth API by Federico Giust
  * Beatport OAuth Connect by Tim Brandwijk
  * Beatport OAuthConnect by Christian Kolloch
@@ -9,29 +8,43 @@
  */
 
 // Usage:
-// $api = new BeatportApi (array $parameters); // initialise
+// $api = new Moussaclarke\BeatportApi (array $parameters); // initialise
 // $response = $api->queryApi (array $query); // run the query
 // echo $response; // do something with response
 
 namespace MoussaClarke;
 
+use GuzzleHttp\Client;
+use GuzzleHttp\HandlerStack;
+use GuzzleHttp\MessageFormatter;
+use GuzzleHttp\Middleware;
+use GuzzleHttp\Subscriber\Oauth\Oauth1;
+use GuzzleHttp\TransferStats;
+
 class BeatportApi
 {
 
-    private $oauth;
+    private $client; // http client
     private $curl;
+    private $logger; // a monolog instance for debugging
+    private $callbackuri; // a callback uri
 
-    public function __construct($parameters)
+    public function __construct($parameters, $logger = NULL)
     {
-        // parameter array consumer, secret, login, password
+        // parameter array consumer, secret, login, password, callback
 
-        // Beatport URLs.
-        $conskey        = $parameters["consumer"]; // Beatport Consumer Key
-        $conssec        = $parameters["secret"]; // Beatport Consumer Secret
-        $beatport_login = $parameters["login"];
-        // Beatport Username
-        $beatport_password = $parameters["password"]; // Beatport Password
-        $this->oauth       = $this->oAuthDance($conskey, $conssec, $beatport_login, $beatport_password);
+        // Beatport credentials and callback uri
+        $consumerkey    = $parameters["consumer"]; // Beatport Consumer Key
+        $consumersecret = $parameters["secret"]; // Beatport Consumer Secret
+        $beatportlogin  = $parameters["login"]; // Beatport Username
+        $beatportpassword = $parameters["password"]; // Beatport Password
+        $this->callbackuri = $parameters["callbackuri"]; //  callback uri
+        
+        // Logger instance if required
+        $this->logger = $logger;
+
+        // do the oauth dance
+        $this->client      = $this->oAuthDance($consumerkey, $consumersecret, $beatportlogin, $beatportpassword);
     }
 
     private function buildQuery($parameters)
@@ -64,60 +77,121 @@ class BeatportApi
 
     }
 
-    private function oAuthDance($conskey, $conssec, $beatport_login, $beatport_password)
+    private function oAuthDance($consumerkey, $consumersecret, $beatportlogin, $beatportpassword)
     {
 
-        /* might need some try/catch e.g. catch (Exception $e) {
-        $content = $e->getMessage();
-        echo $content;
-        }
-         */
+        // stack instance
+        $stack = HandlerStack::create();
+        $stack = $this->getLogger($stack); // add logger if need be
 
         // Beatport URLs
-        $req_url        = 'https://oauth-api.beatport.com/identity/1/oauth/request-token';
-        $authurl        = 'https://oauth-api.beatport.com/identity/1/oauth/authorize';
-        $auth_submiturl = 'https://oauth-api.beatport.com/identity/1/oauth/authorize-submit';
-        $acc_url        = 'https://oauth-api.beatport.com/identity/1/oauth/access-token';
+        $baseuri = 'https://oauth-api.beatport.com';
 
-        $http_request = new \HTTP_Request2(null, \HTTP_Request2::METHOD_GET, array(
-            'ssl_verify_peer' => false,
-            'ssl_verify_host' => false,
-        ));
-        $http_request->setHeader('Accept-Encoding', '.*');
+        // First Leg
 
-        $consumer_request = new \HTTP_OAuth_Consumer_Request();
-        $consumer_request->accept($http_request);
+        // Set up client, passing in stack as a reference
+        $client = new Client(['base_uri' => $baseuri, 'auth' => 'oauth', 'handler' => &$stack]);
 
-        $oauth = new \HTTP_OAuth_Consumer($conskey, $conssec);
-        $oauth->accept($consumer_request);
+        // Create Oauth and pass it to the stack
+        $oauth = new Oauth1([
+            'consumer_key'    => $consumerkey,
+            'consumer_secret' => $consumersecret
+        ]);
 
-        /**
-         * Step 2: Set Request Token to log in
-         */
-        $request_token_info         = $oauth->getRequestToken($req_url);
-        $oauth_request_token        = $oauth->getToken();
-        $oauth_request_token_secret = $oauth->getTokenSecret();
+        $stack->push($oauth);
 
-        /**
-         * Step 3: Use request token to log in and authenticate for 3-legged auth.
-         */
+        // request the token
+        $response = $client->post('identity/1/oauth/request-token',
+            ['form_params' =>[
+            'oauth_callback' => $this->callbackuri
+            ]
+            ]);
 
-        $post_string        = 'oauth_token=' . $oauth_request_token . '&username=' . $beatport_login . '&password=' . $beatport_password . '&submit=Login';
-        // init curl
-        $curl = new \Curl\Curl;
-        $curl->post($auth_submiturl,$post_string);
-        $beatport_response = $curl->response;
+        // parse the response
+        $params = urldecode((string) $response->getBody());
+        parse_str($params); //oauth_token, oauth_token_secret, oauth_callback_confirmed
 
-        /**
-         * Step 4: Use verifier string to request and set the Access Token
-         */
-        $oauth_exploded = array();
-        parse_str($beatport_response, $oauth_exploded);
-        $curl->close();
-        $oauth->getAccessToken('https://oauth-api.beatport.com/identity/1/oauth/access-token', $oauth_exploded['oauth_verifier']);
 
-        return $oauth;
+        // Second Leg
 
+        // prepare the args
+        $postargs= ['oauth_token' => $oauth_token, 'username' => $beatportlogin, 'password' => $beatportpassword, 'submit'=>'Login'];
+
+        // submit credentials
+        $response = $client->post('identity/1/oauth/authorize-submit',
+            ['form_params' => $postargs,
+            'on_stats' => function (TransferStats $stats) use (&$lastrequesturi) {
+                $lastrequesturi = $stats->getEffectiveUri();
+            }
+            ]
+            );
+
+        // parse the callback request query string and put it into an array as it shouldn't over-write last params
+        $params = $lastrequesturi->getQuery();
+        $result = array();
+        parse_str($params, $result);
+
+        // we should check if the tokens match, crappy placeholder implementation for now, but whatevs
+        if ($result['oauth_token'] != $oauth_token) {
+            echo 'tokens dont match. aborting.';
+            die();
+        }
+
+        // Third and final leg
+
+        // lets create a new stack and add oauth with our temp token & token secret
+        $stack = HandlerStack::create();
+        $stack = $this->getLogger($stack); // add logger if need be
+
+        $oauth = new Oauth1([
+            'consumer_key'    => $consumerkey,
+            'consumer_secret' => $consumersecret,
+            'token' => $result['oauth_token'],
+            'token_secret' => $oauth_token_secret
+        ]);
+
+        $stack->push($oauth);
+
+        // Let's get the final access token
+        $response = $client->post('identity/1/oauth/access-token', 
+            ['form_params' => [
+            'oauth_verifier' => $result['oauth_verifier']
+            ]
+            ]);
+
+        // And parse the response
+        $params = urldecode((string) $response->getBody());
+        parse_str($params); //oauth_token, oauth_token_secret, session_id, oauth_callback_confirmed
+
+        // let's create new stack and oauth for subsequent requests
+        $stack = HandlerStack::create();
+        $stack = $this->getLogger($stack); // add logger if need be
+
+        $oauth = new Oauth1([
+            'consumer_key'    => $consumerkey,
+            'consumer_secret' => $consumersecret,
+            'token' => $oauth_token,
+            'token_secret' => $oauth_token_secret
+        ]);
+
+        $stack->push($oauth);
+
+        return $client;
+
+    }
+
+    private function getLogger($stack)
+    // this is in here for debugging purposes, you can ignore it
+    {
+        if ($this->logger) {
+
+        $loggingmiddleware = Middleware::log(
+                $this->logger,
+                new MessageFormatter('{request} - {response}')
+            );
+        $stack->push($loggingmiddleware);
+    }
+    return $stack;
     }
 
     public function queryApi($parameters)
@@ -127,9 +201,9 @@ class BeatportApi
         $path     = $query['path'];
         $qryarray = $query['qryarray'];
 
-        $request = $this->oauth->sendRequest('https://oauth-api.beatport.com/catalog/3/' . $path, $qryarray);
+        $response = $this->client->get('catalog/3/' . $path, ['query' => $qryarray]);
 
-        $json = $request->getBody();
+        $json = $response->getBody();
 
         return json_decode($json, true);
 

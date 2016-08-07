@@ -2,47 +2,29 @@
 
 A simple PHP class to query the Beatport API via Oauth, server side.
 
-I built this because I needed something Object Oriented and relatively unopinionated.
+The use case is for a server to server context - for example I built a simple Beatport RSS link for my label. The library handles the three legged auth flow, submitting what would be the client side login/confirmation process via the server. Beatport does advertise a simpler Direct Access Token, but you need additional permissions, and this library works without that.
 
-The use case is for a server to server context - it's not trying to handle any client side login/confirmation process. For example I built a simple Beatport RSS link for my label, which needs to log in to the Beatport API using my own credentials.
+The class essentially just returns an array which you can then manipulate as you please.
 
-The class essentially just returns an array which you can then manipulate as you please (for example you could then output JSON to use in your own API, build an RSS feed, make a webhook, or whatever else you want)
-
-This is heavily based on the following people's work:
+This is originally based on the following people's work:
 
 * [Beatport API Json Feed](https://github.com/fedegiust/Beatport-API-JSON-feed) by Federico Giust (I originally forked this repo as a starting point)
 * [Beatport OAuth Connect w/ PECL](https://groups.google.com/forum/#!topic/beatport-api/sEpZUJkaSdo) by Tim Brandwijk (Federico Giust's script was based on this one)
-* [Beatport OAuth Connect w/ PEAR](https://groups.google.com/forum/#!topic/beatport-api/sEpZUJkaSdo) by Christian Kolloch (Also based on Tim Brandwijk's script - I used this for the pear/http_oauth groundwork)
+* [Beatport OAuth Connect w/ PEAR](https://groups.google.com/forum/#!topic/beatport-api/sEpZUJkaSdo) by Christian Kolloch (Also based on Tim Brandwijk's script)
 
 ## Aims
 
 * Login and query the Beatport API
 * Abstract away the OAuth pain
 * Send back a simple array with the query results
-* Don't rely on too many esoteric server-side extensions (e.g. PECL) which can be a non-starter on cheap/shared hosts
 
 ## Requirements
 
-* PHP 5.4+ (Might work on earlier versions, but that's what I've been using)
+* PHP 5.5+
 * Beatport API Key and login details (You'll need to request those from Beatport)
-* Pear's HTTP_OAuth (via composer - see install)
-* phpmod's curl class (via composer)
+* Guzzle 6 (via composer)
 
 ## Install
-* This currently relies on older versions of HTTP_OAuth and dependencies, which are not straightforward to get from Packagist. These are therefore fetched from Pear, and there are some legacy non-secure http calls. You will therefore need to add the following to your project's composer.json before installing:
-
-```
-"config" : {
-        "secure-http": false
-    },
-"repositories": [{
-        "type": "pear",
-        "url": "https://pear.php.net"
-    }]
-
-```
-
-* You can then do:
 
 ```
 composer require moussaclarke/beatportapi
@@ -58,6 +40,7 @@ $parameters = array (
   'secret' => 'SECRETKEY', // Your Beatport Secret Key
   'login' => 'BEATPORTLOGIN', // Your Beatport Login Name
   'password' => 'BEATPORTPASSWORD' // Your Beatport Password
+  'callbackuri' => 'http://www.example.com' // This should be a uri on your server, it doesn't need to do anything except receive the request
   );
 
 // query params
@@ -81,12 +64,11 @@ Totally and utterly alpha, and likely to break at any point. Not guaranteed to w
 
 ## Todo
 
-* Store the access token somewhere and re-use it until expiry - we shouldn't need to issue a new one for every single API query. Maybe just a file in /data?
+* Store the tokens somewhere and re-use until expiry
+* Get rid of the need for callback uri
 * Get some sanity into the variable / method names
 * Add some proper error catching / messaging
 * Test and document other query types.
-* Troubleshoot/debug with latest version of Pear libraries so they can be fetched from Packagist, or replace them with something else.
-
 
 ## Maintained
 
