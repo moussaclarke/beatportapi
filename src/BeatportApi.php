@@ -88,9 +88,8 @@ class BeatportApi
             ]);
 
         // parse the response
-        $params = urldecode((string) $response->getBody());
-        $result=[];
-        parse_str($params, $result); //oauth_token, oauth_token_secret, oauth_callback_confirmed
+        $result= $this->parseResponse($response->getBody());
+        //oauth_token, oauth_token_secret, oauth_callback_confirmed
 
         // Second Leg
 
@@ -103,9 +102,8 @@ class BeatportApi
         );
 
         // parse the response and put it into a different array so it doesn't over-write last lot
-        $params = urldecode((string) $response->getBody());
-        $result2=[];
-        parse_str($params, $result2); // oauth_token, oauth_verifier
+        $result2= $this->parseResponse($response->getBody());
+        // oauth_token, oauth_verifier
 
         // we should check if the tokens match, crappy placeholder implementation for now, but whatevs
         if ($result['oauth_token'] != $result2['oauth_token']) {
@@ -133,9 +131,8 @@ class BeatportApi
             ]);
 
         // And parse the response
-        $params = urldecode((string) $response->getBody());
-        $result=[];
-        parse_str($params, $result); //oauth_token, oauth_token_secret, session_id, oauth_callback_confirmed
+        $result= $this->parseResponse($response->getBody());
+        //oauth_token, oauth_token_secret, session_id, oauth_callback_confirmed
 
         // let's create final oauth /stack for subsequent requests
         $oauth = new Oauth1([
@@ -149,6 +146,15 @@ class BeatportApi
 
         return $client;
 
+    }
+
+    private function parseResponse ($body)
+    {
+        // parse the response body and put it into an array
+        $params = urldecode((string) $body);
+        $result=[];
+        parse_str($params, $result);
+        return $result;
     }
 
     private function getStack ($oauth)
