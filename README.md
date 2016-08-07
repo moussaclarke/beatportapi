@@ -41,7 +41,6 @@ $parameters = [
   'secret' => 'SECRETKEY', // Your Beatport Secret Key
   'login' => 'BEATPORTLOGIN', // Your Beatport Login Name
   'password' => 'BEATPORTPASSWORD' // Your Beatport Password
-  'callbackuri' => 'http://www.example.com' // This should be a uri on your server, it doesn't need to do anything except receive the request
   ];
 
 // query parameters
@@ -66,7 +65,6 @@ Totally and utterly alpha, and likely to break at any point. Not guaranteed to w
 ## Todo
 
 * Store the tokens somewhere and re-use until expiry
-* Get rid of the need for callback uri
 * Get some sanity into the variable / method names
 * Add some proper error catching / messaging
 * Test and document other query types.

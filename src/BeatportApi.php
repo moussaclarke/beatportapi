@@ -26,7 +26,6 @@ class BeatportApi
 
     private $client; // http client
     private $logger; // a monolog instance for debugging
-    private $callbackuri; // a callback uri
 
     public function __construct($parameters, $logger = null)
     {
@@ -37,7 +36,6 @@ class BeatportApi
         $consumersecret    = $parameters["secret"]; // Beatport Consumer Secret
         $beatportlogin     = $parameters["login"]; // Beatport Username
         $beatportpassword  = $parameters["password"]; // Beatport Password
-        $this->callbackuri = $parameters["callbackuri"]; //  callback uri
 
         // pass in monolog Logger instance if required
         $this->logger = $logger;
@@ -82,10 +80,10 @@ class BeatportApi
         // Set up http client, passing in stack as a reference
         $client = new Client(['base_uri' => $baseuri, 'auth' => 'oauth', 'handler' => &$stack]);
 
-        // request the token
+        // request the token, with out of bound callback, so no redirect
         $response = $client->post('identity/1/oauth/request-token',
             ['form_params' => [
-                'oauth_callback' => $this->callbackuri,
+                'oauth_callback' => 'oob',
             ],
             ]);
 
@@ -101,15 +99,11 @@ class BeatportApi
 
         // submit credentials
         $response = $client->post('identity/1/oauth/authorize-submit',
-            ['form_params' => $postargs,
-                'on_stats'     => function (TransferStats $stats) use (&$lastrequesturi) {
-                    $lastrequesturi = $stats->getEffectiveUri();
-                },
-            ]
+            ['form_params' => $postargs]
         );
 
         // parse the callback request query string and put it into a different array so it doesn't over-write last params
-        $params = $lastrequesturi->getQuery();
+        $params = urldecode((string) $response->getBody());
         $result2=[];
         parse_str($params, $result2); // oauth_token, oauth_verifier
 
