@@ -73,6 +73,7 @@ class BeatportApi
         $oauth = new Oauth1([
             'consumer_key'    => $consumerkey,
             'consumer_secret' => $consumersecret,
+            'token_secret' =>''
         ]);
 
         $stack=$this->getStack ($oauth);
