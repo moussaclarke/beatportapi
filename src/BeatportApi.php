@@ -108,8 +108,7 @@ class BeatportApi
 
         // we should check if the tokens match, crappy placeholder implementation for now, but whatevs
         if ($result['oauth_token'] != $result2['oauth_token']) {
-            echo 'tokens dont match. aborting.';
-            die();
+            throw new \Exception('Beatport api: tokens dont match!');
         }
 
         // Third and final leg
