@@ -1,6 +1,6 @@
 # Beatport API PHP Class
 
-A simple PHP class to query the Beatport Catalogo API.
+A simple PHP class to query the Beatport Catalog API.
 
 The use case is for a server to server context - for example I used it to build a simple Beatport RSS feed for my label. NB: The class requests an access token each time it's instantiated and doesn't try to persist it to e.g. DB for later use.
 
