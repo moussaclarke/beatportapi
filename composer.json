@@ -20,6 +20,6 @@
         }
     },
     "require": {
-        "guzzlehttp/guzzle": "^7.0",
+        "guzzlehttp/guzzle": "^7.0"
     }
 }
